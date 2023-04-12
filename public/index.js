@@ -42,8 +42,8 @@ function Container() {
     this.divsContainer2 = createElement({container:this.container,tagName:"div",className:"app_divsContainer"});
     this.div3 = createElement({container:this.divsContainer2,tagName:"div",className:"app_divs",style:"width:70vh;height:40vh;border-radius:0 5vw 0 0"});
     this.div4 = createElement({container:this.divsContainer2,tagName:"div",className:"app_divs",style:"width:60vh;height:40vh;border-radius:5vw 0 0 0"});
-    this.container_s = createElement({container:this.container,tagName:"div",className:"app_container_s"});
     this.logo = createElement({container:this.container,tagName:"h1",className:"app_logo",innerHTML:"CAPPAC"});
+    this.container_s = createElement({container:this.container,tagName:"div",className:"app_container_s"});
     this.setLogoPosition();
     window.addEventListener("resize",()=> {this.setLogoPosition()});
 }
@@ -72,7 +72,7 @@ function Menu(options = [{name:"MATERIALS",action:"materialsSetDisplay"}]) {
     this.button.addEventListener("click",()=> {this.setDisplay()});
     this.name = createElement({container:this.optionsContainer,tagName:"h1",className:"menu_name",innerHTML:"MENU"});
     this.options = options.map(data => new MenuOption(this.optionsContainer,data));
-    // this.setDisplay();
+    this.setDisplay();
 }
 Menu.prototype.setDisplay = function() {
     let close = -(this.container.getBoundingClientRect().width - this.button.getBoundingClientRect().width);
@@ -97,8 +97,16 @@ function Models() {
 Models.prototype.setDisplay = function(container = container.container_s,data = JSON.stringify([{name:"Alt dolabi",id:"1324355689",descripcion:"18mm beyaz mdflam"}])) {
     this.data = JSON.parse(data);
     this.container = createElement({container,tagName:"div",className:"models_container"});
-    this.addButton = createElement({container,tagName:"div",id:"models_addButton"});
+    this.addButton = createElement({container,tagName:"span",className:"material-symbols-rounded",innerHTML:"add",id:"models_addButton"});
+    window.addEventListener("resize",this.setAddButtonPosition);
+    this.setAddButtonPosition();
+}
+Models.prototype.setAddButtonPosition = function() {
+    let p = this.addButton.getBoundingClientRect();
+    this.addButton.style.top = innerHeight - p.height + "px";
+    this.addButton.style.left = innerWidth - p.width + "px";
 }
 
 let models = new Models();
+models.setDisplay(container.container_s);
 

@@ -20,3 +20,11 @@ app.post("/test",multer().none(),(req,res)=> {
     console.log(req.body.name);
     res.send("hola");
 })
+
+app.post("/downloadData",multer().none(),(req,res)=> {
+    fs.readFile(`./database/${req.body.name}.json`,(err,data)=> {
+        if(err) throw err;
+        res.send(data.toString());
+        console.log("hola")
+    })
+})
