@@ -25,12 +25,24 @@ function createElement(data = {
     if (data.innerHTML) element.innerHTML = data.innerHTML;
     if (data.type) element.type = data.type;
     if (data.value) element.value = data.value;
+    if (data.placeholder) element.placeholder = data.placeholder;
     if (data.attributs) {
         data.attributs.forEach(at => {
             element.setAttribute(at.name, at.value);
         })
     }
     return element;
+}
+function Context() {
+    this.context = {};
+}
+
+const appContext = new Context();
+Context.prototype.get = function(name = "") {
+    return this.context[name];
+}
+Context.prototype.set = function(name = "name", value = "value" || function(){} || 10) {
+    this.context[name] = value;
 }
 
 
@@ -90,6 +102,7 @@ Menu.prototype.setDisplay = function() {
 let menu = new Menu([{name:"MODELS",value:"modelsSetDisplay"},{name:"AKSESUARS",value:"aksesuarsSetDisplay"}]);
 
 
+
 function Models() {
     this.display = false;
     // appContext.set("modelsSetDisplay",this.setDisplay.bind(this));
@@ -100,6 +113,9 @@ Models.prototype.setDisplay = function(container = container.container_s,data = 
     this.addButton = createElement({container,tagName:"span",className:"material-symbols-rounded",innerHTML:"add",id:"models_addButton"});
     window.addEventListener("resize",this.setAddButtonPosition);
     this.setAddButtonPosition();
+    this.addButton.addEventListener("click",()=> {
+        appContext.get("createNewModel").style.visibility =  "visible";
+    })
 }
 Models.prototype.setAddButtonPosition = function() {
     let p = this.addButton.getBoundingClientRect();
@@ -110,3 +126,61 @@ Models.prototype.setAddButtonPosition = function() {
 let models = new Models();
 models.setDisplay(container.container_s);
 
+
+
+function CreateNewModel() {
+    function Input(container,type,placeholder,name,fontSize,w) {
+        this.container = createElement({container,tagName:"div",className:"createNewModel_input"});
+        this.name = createElement({container:this.container,tagName:"h1",innerHTML:name+":",style:`font-size:${fontSize}`});
+        this.input = createElement({container:this.container,tagName:"input",type,placeholder,style:`width:${w};font-size:${fontSize}`});
+    }
+    this.container = createElement({container:document.body,tagName:"div",className:"createNewModel_container"});
+    this.container_s = createElement({container:this.container,tagName:"div",className:"createNewModel_container_s"});
+    this.error = createElement({container:this.container_s,tagName:"h1",className:"createNewModel_error"});
+    this.name = new Input(this.container_s,"text","","NAME","2vw","80%");
+    this.l = new Input(this.container_s,"number","mm","L","2vw","5vw");
+    this.w = new Input(this.l.container,"number","mm","W","2vw","5vw");
+    this.h = new Input(this.l.container,"number","mm","H","2vw","5vw");
+    this.save = createElement({container:this.container_s,tagName:"input",type:"button",value:"SAVE",className:"createNewModel_save"});
+    this.save.addEventListener("click",()=>{this.createNewModelData()});
+    this.container.addEventListener("click",()=>{this.container.style.visibility = "hidden"});
+    appContext.set("createNewModel",this.container);
+}
+CreateNewModel.prototype.modelNameSearch = function(newName = "",data = []) {
+    let name = null;
+    data.forEach(d => {d == newName ? name = newName : null});
+    return name;
+}
+CreateNewModel.prototype.createNewModelData = async function() {
+    
+    if(this.name.input.value == "" || this.l.input.value == "" || this.w.input.value == "" || this.h.input.value == "") {
+        this.error.innerHTML = "Please enter a value for all required fields";
+    }else {
+        let data = JSON.parse(JSON.stringify(["alt dolabi","cekmece dolabi"]));
+        if(this.modelNameSearch(this.name.input.value,data)) {
+            this.error.innerHTML = "this name already exists.";
+        }else {
+            this.container.style.display = "none";
+            let newData = {
+                name: this.name.input.value,
+                l:this.l.input.value,
+                w:this.w.input.value,
+                h:this.h.input.value,
+            }
+            appContext.get("setNewModelData")(newData);
+        }
+    }
+}
+
+function NewModel() {
+    this.container = createElement({container:document.body,tagName:"div",className:"newModel_container"});
+    this.createNewModel = new CreateNewModel(this.container);
+    appContext.set("setNewModelData",this.setNewModelData.bind(this));
+    this.container.style.visibility = "visible";
+}
+NewModel.prototype.setNewModelData = function(data = {name:"",l:1,w:1,h:1}) {
+    let data_ = data;
+    console.log(data_);
+}
+
+const newModel = new NewModel();
