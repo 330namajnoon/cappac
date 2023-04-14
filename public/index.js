@@ -113,7 +113,7 @@ Models.prototype.setDisplay = function(container = container.container_s,data = 
     this.addButton = createElement({container,tagName:"span",className:"material-symbols-rounded",innerHTML:"add",id:"models_addButton"});
     window.addEventListener("resize",this.setAddButtonPosition);
     this.setAddButtonPosition();
-    this.addButton.addEventListener("click",()=> {
+    this.addButton.addEventListener("click",(e)=> {
         appContext.get("createNewModel").style.visibility =  "visible";
     })
 }
@@ -143,7 +143,14 @@ function CreateNewModel() {
     this.h = new Input(this.l.container,"number","mm","H","2vw","5vw");
     this.save = createElement({container:this.container_s,tagName:"input",type:"button",value:"SAVE",className:"createNewModel_save"});
     this.save.addEventListener("click",()=>{this.createNewModelData()});
-    this.container.addEventListener("click",()=>{this.container.style.visibility = "hidden"});
+    this.container.addEventListener("click",(e)=>{
+        let tr = this.container_s.getBoundingClientRect();
+        let x = e.clientX;
+        let y = e.clientY;
+        if(x < tr.x || x > tr.x + tr.width || y < tr.y || y > tr.y + tr.height) {
+            this.container.style.visibility = "hidden"
+        }
+    });
     appContext.set("createNewModel",this.container);
 }
 CreateNewModel.prototype.modelNameSearch = function(newName = "",data = []) {
